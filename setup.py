@@ -20,7 +20,6 @@
 from distutils.core import setup
 
 import sys, os
-#sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 sys.path.insert(0, os.path.join('src', 'ZookeeperLibrary'))
 
 from version import VERSION
@@ -33,6 +32,7 @@ def main():
           author_email = 'divfor@gmail.com',
           url          = 'https://github.com/divfor/robotframework-zookeeperlibrary',
           package_dir  = { '' : 'src'},
+          install_requires = ["kazoo"],
           packages     = ['ZookeeperLibrary']
           )
         
