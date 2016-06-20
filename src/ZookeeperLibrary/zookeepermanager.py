@@ -20,6 +20,7 @@ class ZookeeperManager(object):
 
     def __init__(self):
         self.zk = None
+        self.zks = []
 
     def connect_to_zookeeper(self, hosts, timeout=10):
         """
@@ -34,8 +35,20 @@ class ZookeeperManager(object):
         """
         self.zk = KazooClient(hosts, timeout)
         self.zk.start()
+        print self.zk
+        self.zks.append(self.zk)
+        return len(self.zks)
 
-    def disconnect_from_zookeeper(self):
+    def switch_to_zookeeper(self, index=None):
+        if index is None:
+            return
+        if 0 < index <= len(self.zks):
+            self.zk = self.zks[index - 1]
+            print self.zk
+        else:
+            raise ValueError("zookeeper connection index out of range")
+
+    def disconnect_from_zookeeper(self, index=None):
         """
         Close all connections to Zookeeper
 
@@ -43,6 +56,8 @@ class ZookeeperManager(object):
         | Connect To Zookeeper | 127.0.0.1: 2181 |
         | Disconnect From Zookeeper |
         """
+        if index:
+            self.switch_to_zookeeper(index)
         self.zk.stop()
         self.zk.close()
 
