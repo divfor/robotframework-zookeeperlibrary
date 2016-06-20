@@ -35,20 +35,18 @@ class ZookeeperManager(object):
         """
         self.zk = KazooClient(hosts, timeout)
         self.zk.start()
-        print self.zk
         self.zks.append(self.zk)
         return len(self.zks)
 
     def switch_to_zookeeper(self, index=None):
-        if index is None:
+        if not index:
             return
         if 0 < index <= len(self.zks):
             self.zk = self.zks[index - 1]
-            print self.zk
         else:
             raise ValueError("zookeeper connection index out of range")
 
-    def disconnect_from_zookeeper(self, index=None):
+    def disconnect_from_zookeeper(self, *indexes):
         """
         Close all connections to Zookeeper
 
@@ -56,10 +54,18 @@ class ZookeeperManager(object):
         | Connect To Zookeeper | 127.0.0.1: 2181 |
         | Disconnect From Zookeeper |
         """
-        if index:
-            self.switch_to_zookeeper(index)
-        self.zk.stop()
-        self.zk.close()
+        if not indexes:
+	    self.zk.stop()
+	    self.zk.close()
+	    n = self.zks.index(self.zk)
+	    self.zks[n] = None
+	    self.zk = None
+        for index in indexes:
+	    self.switch_to_zookeeper(index)
+	    self.zk.stop()
+            self.zk.close()
+	    self.zks[index - 1] = None
+	    self.zk = None
 
     def create_node(self, path, value='', force=False):
         """
