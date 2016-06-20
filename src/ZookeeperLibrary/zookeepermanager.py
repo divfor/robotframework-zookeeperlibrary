@@ -150,4 +150,4 @@ class ZookeeperManager(object):
         _ZookeeperError_ - server returns a non-zero error code.
         """
         children = self.zk.get_children(path)
-        return children
+        return sorted(children)
